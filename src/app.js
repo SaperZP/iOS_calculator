@@ -88,5 +88,12 @@ numpad.addEventListener('click', function (event) {
     evaluate('null');
   }
 
+  if (buttonType.contains('percent') && number !== '0') {
+    number = (+number / 100).toString();
+    if (+number % 1 !== 0) {
+      number = Number(number).toFixed(2);
+    }
+  }
+
   render();
 })
