@@ -6,38 +6,31 @@ let buffer = null;
 let number = '0';
 let prevOperation = null;
 
-function renderer() {
-  if (buffer) {
-    resultDisplay.textContent = buffer;
-  } else {
-    resultDisplay.textContent = '0';
-  }
+function render() {
+  resultDisplay.textContent = buffer !== null ? buffer.toFixed(2) : '0';
   operationsDisplay.textContent = number;
 }
 
-function evaluator(operator) {
+function evaluate(operator) {
+  const num = parseFloat(number);
 
-  if (buffer && prevOperation) {
+  if (buffer !== null) {
     switch (prevOperation) {
       case 'division':
-        buffer = +buffer / +number;
+        buffer /= num;
         break;
-
       case 'multiplication':
-        buffer = +buffer * +number;
+        buffer *= num;
         break;
-
       case 'addition':
-        buffer = +buffer + +number;
+        buffer += num;
         break;
-
       case 'subtraction':
-        buffer = +buffer - +number;
+        buffer -= num;
         break;
     }
-
   } else {
-    buffer = number;
+    buffer = num;
   }
 
   prevOperation = operator;
@@ -45,20 +38,21 @@ function evaluator(operator) {
 }
 
 numpad.addEventListener('click', function (event) {
-  const buttonType = event.target.classList;
+  const target = event.target;
+  const buttonType = target.classList;
 
   if (buttonType.contains('number') && number.length < 7) {
-    number = Number(number) === 0 && !number.includes('.')
-        ? event.target.textContent
-        : `${number + event.target.textContent}`;
+    number = number === '0' && !number.includes('.')
+        ? target.textContent
+        : number + target.textContent;
   }
 
   if (buttonType.contains('decimal') && !number.includes('.')) {
     number += '.';
   }
 
-  if (buttonType.contains('zero') && Number(number) !== 0 || buttonType.contains('zero') && number.includes('.')) {
-    number += event.target.textContent
+  if (buttonType.contains('zero') && (number !== '0' || number.includes('.'))) {
+    number += target.textContent;
   }
 
   if (buttonType.contains('ac')) {
@@ -67,15 +61,24 @@ numpad.addEventListener('click', function (event) {
     prevOperation = null;
   }
 
-  if (buttonType.contains('pm') && Number(number) !== 0) {
-    number = -+number.toString();
+  if (buttonType.contains('pm') && number !== '0') {
+    number = (-parseFloat(number)).toString();
   }
 
-  if (buttonType.contains('division')) evaluator('division');
-  if (buttonType.contains('multiplication')) evaluator('multiplication');
-  if (buttonType.contains('addition')) evaluator('addition');
-  if (buttonType.contains('subtraction')) evaluator('subtraction');
-  if (buttonType.contains('equal') && number && buffer && prevOperation) evaluator('null');
+  if (buttonType.contains('operator')) {
+    const operators = document.querySelectorAll('.operator');
+    operators.forEach(operator => operator.classList.remove('operator-active'));
+    target.classList.add('operator-active');
 
-  renderer();
+    evaluate(target.dataset.operation);
+  }
+
+  if (buttonType.contains('equal') && buffer !== null && prevOperation !== null) {
+    const operators = document.querySelectorAll('.operator');
+    operators.forEach(operator => operator.classList.remove('operator-active'));
+
+    evaluate('null');
+  }
+
+  render();
 })

@@ -59,6 +59,10 @@ body {
     color: black;
 }
 
+.operator-active {
+    background-color: white;
+}
+
 .button.zero {
     width: 220px;
     border-radius: 55px;
