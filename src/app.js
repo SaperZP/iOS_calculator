@@ -7,7 +7,15 @@ let number = '0';
 let prevOperation = null;
 
 function render() {
-  resultDisplay.textContent = buffer !== null ? buffer.toFixed(2) : '0';
+  let normalisedNumber;
+
+  if (buffer !== null) {
+    normalisedNumber = buffer % 1 !== 0 ? buffer.toFixed(2) : buffer.toString();
+  } else {
+    normalisedNumber = '0';
+  }
+
+  resultDisplay.textContent = normalisedNumber;
   operationsDisplay.textContent = number;
 }
 
